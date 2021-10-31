@@ -1,0 +1,57 @@
+YOU NEED MOBAXTERM FOR THIS!!!  
+____________________________________________
+
+[Debian 11 Setup]
+
+:Run these commands in ssh under username "root"
+
+
+apt install wget
+apt install nload
+apt install ipset
+apt install dstat
+apt install tcpdump
+apt install curl
+apt install htop
+
+:after all the installs run these commands to start adding configs
+
+sudo apt-get update&&sudo apt-get upgrade -y
+mkdir /dev/net
+mknod /dev/net/tun c 10 200
+chmod 666 /dev/net/tun
+
+curl -O https://raw.githubusercontent.com/angristan/openvpn-install/master/openvpn-install.sh
+chmod +x openvpn-install.sh
+./openvpn-install.sh
+
+:Information
+
+Use port 1194 with protocall UDP and Google DNS (8.8.8.8) and create first config as "OWNER" then click enter
+drag config out of ssh and onto your desktop double click the config and it will open in OpenVPN then connect
+Also for the Google dns I belive its 9 on that installer ill set it up if you cant find this.
+(You can delete CONFIG off pc/laptop as you no longer need it unless you delete it off OpenVPN)
+
+:You now have a config and can esablish a connection also if you made it UDP apply the tables below.
+
+
+METHOD PATCH | "UDP-BYPASS"
+
+iptables -t mangle -A PREROUTING -s 243.45.216.58-j DROP
+iptables -A INPUT -p udp -m length --length 49 -j DROP
+iptables -A INPUT -p udp -i eth0 ! -s 0.0.0.0/0 --dport 39356 -j DROP
+iptables -A OUTPUT -p udp --dport 5353 -j DROP
+iptables -t mangle -A PREROUTING -s 133.154.184.21 -j DROP
+iptables -A INPUT -p udp -m length --length 190 -j DROP
+iptables -A INPUT -p udp -i eth0 ! -s 0.0.0.0/0 --dport 38815 -j DROP
+iptables -A OUTPUT -p udp --dport 9987 -j DROP
+
+TURNS ICMP OFF
+
+iptables -t raw -A PREROUTING -p icmp --icmp-type=echo-reply -j DROP
+iptables -t raw -A PREROUTING -p icmp -j DROP
+
+:Type these after done
+
+iptables-save
+clear
